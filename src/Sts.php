@@ -127,7 +127,7 @@ class Sts{
 			return $result;
 		}catch(\Exception $e){
 			if($result == null){
-				$result = "error: " . + $e->getMessage();
+				$result = "error: " . $e->getMessage();
 			}else{
 				$result = json_encode($result);
 			}
@@ -149,7 +149,7 @@ class Sts{
 			array_push($resources, $scopes[$i]->get_resource());
 			
 			$statement = array(
-			'actions' => $actions,
+			'action' => $actions,
 			'effect' => $scopes[$i]->get_effect(),
 			'resource' => $resources
 			);

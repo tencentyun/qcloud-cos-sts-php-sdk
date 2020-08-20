@@ -1,5 +1,5 @@
 {
-    "name": "tencent/qcloud-sts-sdk",
+    "name": "qcloud_sts/qcloud-sts-sdk",
     "description": "PHP SDK for QCloud STS",
     "keywords": [
         "qcloud", "sts", "cos", "php"
