@@ -14,7 +14,7 @@ class Sts{
 		ksort($obj);
 		$arr = array();
 		if(!is_array($obj)){
-			throw new \Exception($obj + " must be a array");
+			throw new \Exception('$obj must be an array, the actual value is:' . json_encode($obj));
 		}
 		foreach ($obj as $key => $val) {
 			array_push($arr, $key . '=' . ($notEncode ? $val : rawurlencode($val)));
@@ -31,7 +31,7 @@ class Sts{
 	// v2接口的key首字母小写，v3改成大写，此处做了向下兼容
 	function backwardCompat($result) {
 		if(!is_array($result)){
-			throw new \Exception($result + " must be a array");
+			throw new \Exception('$result must be an array, the actual value is:' . json_encode($result));
 		}
 		$compat = array();
 		foreach ($result as $key => $value) {
