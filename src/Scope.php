@@ -39,7 +39,7 @@ class Scope{
 		}
 		$index = strripos($this->bucket, '-');
 		if($index < 0){
-			throw new Exception("bucket is invalid: " + $this->bucket);
+			throw new Exception("bucket is invalid: " . $this->bucket);
 		}
 		$appid = substr($this->bucket, $index + 1);
 		if(!(strpos($this->resourcePrefix, '/') === 0)){
