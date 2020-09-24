@@ -34,6 +34,9 @@ class Scope{
 		if($this->bucket == null){
 			throw new \Exception("bucket == null");
 		}
+		if($this->region == null){
+			throw new \Exception("region == null");
+		}
 		if($this->resourcePrefix == null){
 			throw new \Exception("resourcePrefix == null");
 		}

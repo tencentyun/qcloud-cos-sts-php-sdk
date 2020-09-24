@@ -65,6 +65,9 @@ class Sts{
 				}else{
 					throw new \Exception("allowPrefix == null");
 				}
+				if(!array_key_exists('region', $config)) {
+					throw new \Exception("region == null");
+				}
 				$policy = array(
 					'version'=> '2.0',
 					'statement'=> array(
