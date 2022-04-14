@@ -4,7 +4,6 @@ namespace QCloud\COSSTS;
 
 class Sts{
 	// 临时密钥计算样例
-	
 	function _hex2bin($data) {
 		$len = strlen($data);
 		return pack("H" . $len, $data);
@@ -23,7 +22,18 @@ class Sts{
 	}
 	// 计算临时密钥用的签名
 	function getSignature($opt, $key, $method, $config) {
-		$formatString = $method . $config['domain'] . '/?' . $this->json2str($opt, 1);
+		$host = "sts.tencentcloudapi.com";
+
+		if (array_key_exists('domain', $config)) {
+			$host = $config['domain'];
+		}
+
+		if (array_key_exists('endpoint', $config)) {
+			$host = "sts." . $config['endpoint'];
+		}
+
+		echo "host:" . $host . PHP_EOL;
+		$formatString = $method . $host . '/?' . $this->json2str($opt, 1);
 		$sign = hash_hmac('sha1', $formatString, $key);
 		$sign = base64_encode($this->_hex2bin($sign));
 		return $sign;
@@ -47,7 +57,7 @@ class Sts{
 	}
 	// 获取临时密钥
 	function getTempKeys($config) {
-				$result = null;
+		$result = null;
 		try{
 			if(array_key_exists('policy', $config)){
 				$policy = $config['policy'];
@@ -74,7 +84,6 @@ class Sts{
 						array(
 							'action'=> $config['allowActions'],
 							'effect'=> 'allow',
-							'principal'=> array('qcs'=> array('*')),
 							'resource'=> array(
 								'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $config['allowPrefix']
 							)
@@ -104,7 +113,21 @@ class Sts{
 				'Policy'=> urlencode($policyStr)
 			);
 			$params['Signature'] = $this->getSignature($params, $config['secretKey'], $Method, $config);
-			$url = $config['url'];
+			$url = 'https://sts.tencentcloudapi.com/';
+
+			if(array_key_exists('url', $config)) {
+				$url = $config['url'];
+			}
+
+			if(!array_key_exists('url', $config) && array_key_exists('domain', $config)) {
+				$url = 'https://sts.' . $config['domain'];
+			}
+
+			if(array_key_exists('endpoint', $config)) {
+				$url = 'https://sts.' . $config['endpoint'];
+			}
+
+			echo "url:" . $url . PHP_EOL;
 			$ch = curl_init($url);
 			if(array_key_exists('proxy', $config)){
 				$config['proxy'] && curl_setopt($ch, CURLOPT_PROXY, $config['proxy']);
@@ -137,6 +160,113 @@ class Sts{
 			throw new \Exception($result);
 		}
 	}
+
+	function getRoleCredential($config) {
+		$result = null;
+		try{
+			if(array_key_exists('policy', $config)){
+				$policy = $config['policy'];
+			}else{
+				if(array_key_exists('bucket', $config)){
+					$ShortBucketName = substr($config['bucket'],0, strripos($config['bucket'], '-'));
+					$AppId = substr($config['bucket'], 1 + strripos($config['bucket'], '-'));
+				}else{
+					throw new \Exception("bucket== null");
+				}
+				if(array_key_exists('allowPrefix', $config)){
+					if(!(strpos($config['allowPrefix'], '/') === 0)){
+						$config['allowPrefix'] = '/' . $config['allowPrefix'];
+					}
+				}else{
+					throw new \Exception("allowPrefix == null");
+				}
+				if(!array_key_exists('region', $config)) {
+					throw new \Exception("region == null");
+				}
+				$policy = array(
+					'version'=> '2.0',
+					'statement'=> array(
+						array(
+							'action'=> $config['allowActions'],
+							'effect'=> 'allow',
+							'resource'=> array(
+								'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $config['allowPrefix']
+							)
+						)
+					)
+				);
+			}
+			if (array_key_exists('roleArn', $config)) {
+				$RoleArn = $config['roleArn'];
+			} else {
+				throw new \Exception("roleArn == null");
+			}
+			$policyStr = str_replace('\\/', '/', json_encode($policy));
+			$Action = 'AssumeRole';
+			$Nonce = rand(10000, 20000);
+			$Timestamp = time();
+			$Method = 'POST';
+			$ExternalId = "";
+			if (array_key_exists('externalId', $config)) {
+				$ExternalId = $config['externalId'];
+			}
+			if(array_key_exists('durationSeconds', $config)){
+				if(!(is_integer($config['durationSeconds']))){
+					throw new \Exception("durationSeconds must be a int type");
+				}
+			}
+			$params = array(
+				'SecretId'=> $config['secretId'],
+				'Timestamp'=> $Timestamp,
+				'RoleArn'=> $RoleArn,
+				'Action'=> $Action,
+				'Nonce'=> $Nonce,
+				'DurationSeconds'=> $config['durationSeconds'],
+				'Version'=>'2018-08-13',
+				'RoleSessionName'=> 'cos',
+				'Region'=> $config['region'],
+				'ExternalId' => $ExternalId,
+				'Policy'=> urlencode($policyStr)
+			);
+			$params['Signature'] = $this->getSignature($params, $config['secretKey'], $Method, $config);
+			$url = 'https://sts.internal.tencentcloudapi.com/';
+
+			if(array_key_exists('endpoint', $config)) {
+				$url = 'https://sts.' . $config['endpoint'];
+			}
+			$ch = curl_init($url);
+			if(array_key_exists('proxy', $config)){
+				$config['proxy'] && curl_setopt($ch, CURLOPT_PROXY, $config['proxy']);
+			}
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,0);
+			curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->json2str($params));
+			$result = curl_exec($ch);
+			if(curl_errno($ch)) $result = curl_error($ch);
+			curl_close($ch);
+			$result = json_decode($result, 1);
+			if (isset($result['Response'])) {
+				$result = $result['Response'];
+				if(isset($result['Error'])){
+					throw new \Exception("get cam failed");
+				}
+				$result['startTime'] = $result['ExpiredTime'] - $config['durationSeconds'];
+			}
+			$result = $this->backwardCompat($result);
+			return $result;
+		}catch(\Exception $e){
+			if($result == null){
+				$result = "error: " . $e->getMessage();
+			}else{
+				$result = json_encode($result);
+			}
+			throw new \Exception($result);
+		}
+	}
+
 	
 	// get policy
 	function getPolicy($scopes){
