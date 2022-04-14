@@ -32,7 +32,6 @@ class Sts{
 			$host = "sts." . $config['endpoint'];
 		}
 
-		echo "host:" . $host . PHP_EOL;
 		$formatString = $method . $host . '/?' . $this->json2str($opt, 1);
 		$sign = hash_hmac('sha1', $formatString, $key);
 		$sign = base64_encode($this->_hex2bin($sign));
@@ -127,7 +126,6 @@ class Sts{
 				$url = 'https://sts.' . $config['endpoint'];
 			}
 
-			echo "url:" . $url . PHP_EOL;
 			$ch = curl_init($url);
 			if(array_key_exists('proxy', $config)){
 				$config['proxy'] && curl_setopt($ch, CURLOPT_PROXY, $config['proxy']);
