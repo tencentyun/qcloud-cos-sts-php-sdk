@@ -159,6 +159,7 @@ class Sts{
 		}
 	}
 
+	//申请角色授权
 	function getRoleCredential($config) {
 		$result = null;
 		try{
