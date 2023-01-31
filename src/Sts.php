@@ -61,34 +61,55 @@ class Sts{
 			if(array_key_exists('policy', $config)){
 				$policy = $config['policy'];
 			}else{
+
 				if(array_key_exists('bucket', $config)){
 					$ShortBucketName = substr($config['bucket'],0, strripos($config['bucket'], '-'));
 					$AppId = substr($config['bucket'], 1 + strripos($config['bucket'], '-'));
 				}else{
-					throw new \Exception("bucket== null");
+					throw new Exception("bucket== null");
 				}
-				if(array_key_exists('allowPrefix', $config)){
-					if(!(strpos($config['allowPrefix'], '/') === 0)){
-					$config['allowPrefix'] = '/' . $config['allowPrefix'];
+
+				if(array_key_exists('allowPrefixes', $config)){
+					$resource = array();
+					foreach($config['allowPrefixes'] as &$val) {
+						if (!(strpos($val, '/') === 0)) {
+						    $allow = '/' . $val;
+						}
+						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
 					}
 				}else{
-					throw new \Exception("allowPrefix == null");
+					throw new Exception("allowPrefix == null");
 				}
+
 				if(!array_key_exists('region', $config)) {
 					throw new \Exception("region == null");
 				}
+
+				if (!array_key_exists('config', $config)) {
+					$policy = array(
+						'version'=> '2.0',
+						'statement'=> array(
+							array(
+								'action'=> $config['allowActions'],
+								'effect'=> 'allow',
+								'resource'=> $resource
+							)
+						)
+					);	
+				}
+
 				$policy = array(
 					'version'=> '2.0',
 					'statement'=> array(
 						array(
 							'action'=> $config['allowActions'],
 							'effect'=> 'allow',
-							'resource'=> array(
-								'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $config['allowPrefix']
-							)
+							'resource'=> $resource,
+							'condition'=>json_encode($config['condition'])
 						)
 					)
-				);	
+				);
+				
 			}
 			$policyStr = str_replace('\\/', '/', json_encode($policy));
 			$Action = 'GetFederationToken';
@@ -172,25 +193,41 @@ class Sts{
 				}else{
 					throw new \Exception("bucket== null");
 				}
-				if(array_key_exists('allowPrefix', $config)){
-					if(!(strpos($config['allowPrefix'], '/') === 0)){
-						$config['allowPrefix'] = '/' . $config['allowPrefix'];
+				if(array_key_exists('allowPrefixes', $config)){
+					$resource = array();
+					foreach($config['allowPrefixes'] as &$val) {
+						if (!(strpos($val, '/') === 0)) {
+						    $allow = '/' . $val;
+						}
+						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
 					}
 				}else{
-					throw new \Exception("allowPrefix == null");
+					throw new Exception("allowPrefix == null");
 				}
 				if(!array_key_exists('region', $config)) {
 					throw new \Exception("region == null");
 				}
+				if (!array_key_exists('config', $config)) {
+					$policy = array(
+						'version'=> '2.0',
+						'statement'=> array(
+							array(
+								'action'=> $config['allowActions'],
+								'effect'=> 'allow',
+								'resource'=> $resource
+							)
+						)
+					);	
+				}
+
 				$policy = array(
 					'version'=> '2.0',
 					'statement'=> array(
 						array(
 							'action'=> $config['allowActions'],
 							'effect'=> 'allow',
-							'resource'=> array(
-								'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $config['allowPrefix']
-							)
+							'resource'=> $resource,
+							'condition'=>json_encode($config['condition'])
 						)
 					)
 				);
