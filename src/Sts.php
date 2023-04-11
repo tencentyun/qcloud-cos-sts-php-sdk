@@ -180,6 +180,7 @@ class Sts{
 		}
 	}
 
+	// 获取临时密钥-兼容万象资源
 	function getTempKeys4Ci($config) {
 		$result = null;
 		try{
@@ -191,7 +192,7 @@ class Sts{
 					$ShortBucketName = substr($config['bucket'],0, strripos($config['bucket'], '-'));
 					$AppId = substr($config['bucket'], 1 + strripos($config['bucket'], '-'));
 				}else{
-					throw new \Exception("bucket== null");
+					throw new Exception("bucket== null");
 				}
 
 				$resource = array();
@@ -204,7 +205,7 @@ class Sts{
 						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
 					}
 				}else{
-					throw new \Exception("allowPrefix == null");
+					throw new Exception("allowPrefix == null");
 				}
 
 				if(!array_key_exists('region', $config)) {
