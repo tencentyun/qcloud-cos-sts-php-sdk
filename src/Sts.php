@@ -66,20 +66,21 @@ class Sts{
 					$ShortBucketName = substr($config['bucket'],0, strripos($config['bucket'], '-'));
 					$AppId = substr($config['bucket'], 1 + strripos($config['bucket'], '-'));
 				}else{
-					throw new Exception("bucket== null");
+					throw new \Exception("bucket== null");
 				}
 
-				if(array_key_exists('allowPrefixes', $config)){
+				if(array_key_exists('allowPrefix', $config)){
 					$resource = array();
-					foreach($config['allowPrefixes'] as &$val) {
+					foreach($config['allowPrefix'] as &$val) {
 						if (!(strpos($val, '/') === 0)) {
-						    $allow = '/' . $val;
+							$allow = '/' . $val;
 						}
-						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
+						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . '/' . $val;
 					}
 				}else{
-					throw new Exception("allowPrefix == null");
+					throw new \Exception("allowPrefix == null");
 				}
+
 
 				if(!array_key_exists('region', $config)) {
 					throw new \Exception("region == null");
@@ -95,7 +96,7 @@ class Sts{
 								'resource'=> $resource
 							)
 						)
-					);	
+					);
 				}
 
 				$policy = array(
@@ -109,7 +110,7 @@ class Sts{
 						)
 					)
 				);
-				
+
 			}
 			$policyStr = str_replace('\\/', '/', json_encode($policy));
 			$Action = 'GetFederationToken';
@@ -197,15 +198,15 @@ class Sts{
 
 				$resource = array();
 				$resource[] = 'qcs::ci:' . $config['region'] . ':uid/' . $AppId . ':' . 'bucket/' . $config['bucket'] . '/*';
-				if(array_key_exists('allowPrefixes', $config)){
-					foreach($config['allowPrefixes'] as &$val) {
+				if(array_key_exists('allowPrefix', $config)){
+					foreach($config['allowPrefix'] as &$val) {
 						if (!(strpos($val, '/') === 0)) {
 							$allow = '/' . $val;
 						}
-						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
+                        $resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . '/' . $val;
 					}
 				}else{
-					throw new Exception("allowPrefix == null");
+					throw new \Exception("allowPrefix == null");
 				}
 
 				if(!array_key_exists('region', $config)) {
@@ -320,16 +321,16 @@ class Sts{
 				}else{
 					throw new \Exception("bucket== null");
 				}
-				if(array_key_exists('allowPrefixes', $config)){
+				if(array_key_exists('allowPrefix', $config)){
 					$resource = array();
-					foreach($config['allowPrefixes'] as &$val) {
+					foreach($config['allowPrefix'] as &$val) {
 						if (!(strpos($val, '/') === 0)) {
-						    $allow = '/' . $val;
+							$allow = '/' . $val;
 						}
-						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . $val;
+                        $resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . '/' . $val;
 					}
 				}else{
-					throw new Exception("allowPrefix == null");
+					throw new \Exception("allowPrefix == null");
 				}
 				if(!array_key_exists('region', $config)) {
 					throw new \Exception("region == null");
@@ -344,7 +345,7 @@ class Sts{
 								'resource'=> $resource
 							)
 						)
-					);	
+					);
 				}
 
 				$policy = array(
@@ -430,33 +431,33 @@ class Sts{
 		}
 	}
 
-	
+
 	// get policy
 	function getPolicy($scopes){
 		if (!is_array($scopes)){
 			return null;
 		}
 		$statements = array();
-		
+
 		for($i=0, $counts=count($scopes); $i < $counts; $i++){
 			$actions=array();
 			$resources = array();
 			array_push($actions, $scopes[$i]->get_action());
 			array_push($resources, $scopes[$i]->get_resource());
-			
+
 			$statement = array(
-			'action' => $actions,
-			'effect' => $scopes[$i]->get_effect(),
-			'resource' => $resources
+				'action' => $actions,
+				'effect' => $scopes[$i]->get_effect(),
+				'resource' => $resources
 			);
 			array_push($statements, $statement);
 		}
-			
+
 		$policy = array(
 			'version' => '2.0',
 			'statement' => $statements
 		);
 		return $policy;
-	}	
+	}
 }
 ?>
