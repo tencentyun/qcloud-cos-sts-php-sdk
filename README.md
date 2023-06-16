@@ -31,6 +31,7 @@
 |region|string| 存储桶所属地域，如 ap-guangzhou|
 |allowPrefix|string|资源的前缀，如授予操作所有资源，则为`*`；如授予操作某个路径a下的所有资源,则为 `a/*`，如授予只能操作特定的文件a/test.jpg, 则为`a/test.jpg`|
 |allowActions|array| 授予 COS API 权限集合, 如简单上传操作：name/cos:PutObject|
+|allowCiSource|boolean| 是否使用万象资源 true: 是，不传或false则无法使用万象资源|
 |policy|array| 策略：由 allowActions、bucket、region、allowPrefix字段组成的描述授权的具体信息|
 
 ### 返回值说明
