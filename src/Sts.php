@@ -77,6 +77,10 @@ class Sts{
 						}
 						$resource[] = 'qcs::cos:' . $config['region'] . ':uid/' . $AppId . ':' . $config['bucket'] . '/' . $val;
 					}
+					// 处理万象资源
+					if(array_key_exists('allowCiSource', $config) && $config['allowCiSource'] === true) {
+						$resource[] = 'qcs::ci:' . $config['region'] . ':uid/' . $AppId . ':' . 'bucket/' . $config['bucket'] . '/*';
+					}
 				}else{
 					throw new \Exception("allowPrefix == null");
 				}
@@ -181,7 +185,7 @@ class Sts{
 		}
 	}
 
-	// 获取临时密钥-兼容万象资源
+	// 获取临时密钥-兼容万象资源 不在维护，请使用getTempKeys函数，$config的ci_source字段
 	function getTempKeys4Ci($config) {
 		$result = null;
 		try{
