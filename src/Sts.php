@@ -90,7 +90,7 @@ class Sts{
 					throw new \Exception("region == null");
 				}
 
-				if (!array_key_exists('config', $config)) {
+				if (!array_key_exists('condition', $config)) {
 					$policy = array(
 						'version'=> '2.0',
 						'statement'=> array(
@@ -101,20 +101,19 @@ class Sts{
 							)
 						)
 					);
-				}
-
-				$policy = array(
-					'version'=> '2.0',
-					'statement'=> array(
-						array(
-							'action'=> $config['allowActions'],
-							'effect'=> 'allow',
-							'resource'=> $resource,
-							'condition'=>json_encode($config['condition'])
+				} else {
+					$policy = array(
+						'version'=> '2.0',
+						'statement'=> array(
+							array(
+								'action'=> $config['allowActions'],
+								'effect'=> 'allow',
+								'resource'=> $resource,
+								'condition'=>json_encode($config['condition'])
+							)
 						)
-					)
-				);
-
+					);
+				}
 			}
 			$policyStr = str_replace('\\/', '/', json_encode($policy));
 			$Action = 'GetFederationToken';
@@ -217,7 +216,7 @@ class Sts{
 					throw new \Exception("region == null");
 				}
 
-				if (!array_key_exists('config', $config)) {
+				if (!array_key_exists('condition', $config)) {
 					$policy = array(
 						'version'=> '2.0',
 						'statement'=> array(
@@ -228,19 +227,19 @@ class Sts{
 							)
 						)
 					);
-				}
-
-				$policy = array(
-					'version'=> '2.0',
-					'statement'=> array(
-						array(
-							'action'=> $config['allowActions'],
-							'effect'=> 'allow',
-							'resource'=> $resource,
-							'condition'=>json_encode($config['condition'])
+				} else {
+					$policy = array(
+						'version'=> '2.0',
+						'statement'=> array(
+							array(
+								'action'=> $config['allowActions'],
+								'effect'=> 'allow',
+								'resource'=> $resource,
+								'condition'=>json_encode($config['condition'])
+							)
 						)
-					)
-				);
+					);
+				}
 
 			}
 			$policyStr = str_replace('\\/', '/', json_encode($policy));
@@ -339,7 +338,7 @@ class Sts{
 				if(!array_key_exists('region', $config)) {
 					throw new \Exception("region == null");
 				}
-				if (!array_key_exists('config', $config)) {
+				if (!array_key_exists('condition', $config)) {
 					$policy = array(
 						'version'=> '2.0',
 						'statement'=> array(
@@ -350,19 +349,19 @@ class Sts{
 							)
 						)
 					);
-				}
-
-				$policy = array(
-					'version'=> '2.0',
-					'statement'=> array(
-						array(
-							'action'=> $config['allowActions'],
-							'effect'=> 'allow',
-							'resource'=> $resource,
-							'condition'=>json_encode($config['condition'])
+				} else {
+					$policy = array(
+						'version'=> '2.0',
+						'statement'=> array(
+							array(
+								'action'=> $config['allowActions'],
+								'effect'=> 'allow',
+								'resource'=> $resource,
+								'condition'=>json_encode($config['condition'])
+							)
 						)
-					)
-				);
+					);
+				}
 			}
 			if (array_key_exists('roleArn', $config)) {
 				$RoleArn = $config['roleArn'];
