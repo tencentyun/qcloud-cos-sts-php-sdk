@@ -109,7 +109,7 @@ class Sts{
 								'action'=> $config['allowActions'],
 								'effect'=> 'allow',
 								'resource'=> $resource,
-								'condition'=>json_encode($config['condition'])
+								'condition'=>$config['condition']
 							)
 						)
 					);
@@ -235,7 +235,7 @@ class Sts{
 								'action'=> $config['allowActions'],
 								'effect'=> 'allow',
 								'resource'=> $resource,
-								'condition'=>json_encode($config['condition'])
+								'condition'=>$config['condition']
 							)
 						)
 					);
@@ -357,7 +357,7 @@ class Sts{
 								'action'=> $config['allowActions'],
 								'effect'=> 'allow',
 								'resource'=> $resource,
-								'condition'=>json_encode($config['condition'])
+								'condition'=>$config['condition']
 							)
 						)
 					);
